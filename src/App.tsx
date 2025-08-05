@@ -18,16 +18,10 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: "projects",
-    title: "Projects",
+    segment: "contacts",
+    title: "Contacts",
     icon: <FolderIcon />,
-    pattern: "projects{/:projectId}*",
-  },
-  {
-    segment: "employees",
-    title: "Employees",
-    icon: <PersonIcon />,
-    pattern: "employees{/:employeeId}*",
+    pattern: "contacts{/:contactId}*",
   },
 ];
 

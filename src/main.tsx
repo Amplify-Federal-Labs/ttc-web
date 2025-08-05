@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import Layout from "./layouts/dashboard";
 import DashboardPage from "./pages";
-import EmployeesCrudPage from "./pages/employees";
+import EmployeesCrudPage from "./pages/contacts";
 import SignInPage from "./pages/signin";
 import ProjectListContainer from "./pages/projects";
 import ProjectContainer from "./pages/project";
