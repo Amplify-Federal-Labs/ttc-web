@@ -1,7 +1,6 @@
 import * as React from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonIcon from "@mui/icons-material/Person";
-import FolderIcon from "@mui/icons-material/Folder";
 import { Outlet } from "react-router";
 import { ReactRouterAppProvider } from "@toolpad/core/react-router";
 import type { Navigation, Authentication } from "@toolpad/core/AppProvider";
@@ -20,7 +19,7 @@ const NAVIGATION: Navigation = [
   {
     segment: "contacts",
     title: "Contacts",
-    icon: <FolderIcon />,
+    icon: <PersonIcon />,
     pattern: "contacts{/:contactId}*",
   },
 ];
