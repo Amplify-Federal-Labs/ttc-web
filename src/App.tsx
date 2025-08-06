@@ -26,7 +26,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: "AF Tracker",
+  title: "Thoughts That Count",
 };
 
 const AUTHENTICATION: Authentication = {
