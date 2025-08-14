@@ -26,10 +26,10 @@ const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
         minHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: messages.length === 0 ? 'flex-end' : 'flex-start'
+        justifyContent: 'flex-end'
       }}
     >
-      <Stack spacing={2} sx={{ flexGrow: 1 }}>
+      <Stack spacing={2}>
         {messages.map((message) => (
           <MessageLine key={message.id} message={message} />
         ))}
