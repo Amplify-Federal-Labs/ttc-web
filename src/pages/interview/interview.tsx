@@ -1,4 +1,4 @@
-import { Divider, Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import type { Message } from "../../types";
 import InterviewHistory from "./interviewHistory";
 import UserPropmt from "./userPrompt";
@@ -11,11 +11,34 @@ interface InterviewProps {
 const Interview = ({ messages, onUserPropmt }: InterviewProps) => {
   return (
     <Stack
-      spacing={2}
-      divider={<Divider orientation="horizontal" flexItem />}
+      sx={{
+        height: "100%",
+      }}
     >
-      <InterviewHistory messages={messages} />
-      <UserPropmt onEnter={onUserPropmt} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflow: "auto",
+          minHeight: 0,
+          padding: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end'
+        }}
+      >
+        <InterviewHistory messages={messages} />
+      </Box>
+
+      <Divider />
+
+      <Box
+        sx={{
+          flexShrink: 0,
+          padding: 1,
+        }}
+      >
+        <UserPropmt onEnter={onUserPropmt} />
+      </Box>
     </Stack>
   );
 };

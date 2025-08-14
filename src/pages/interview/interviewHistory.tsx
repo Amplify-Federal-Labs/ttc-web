@@ -1,27 +1,29 @@
-import { Paper, Stack, type SxProps } from "@mui/material";
-import type { Message, Role } from "../../types";
+import { Stack } from "@mui/material";
+import { useEffect, useRef } from "react";
+import type { Message } from "../../types";
 import MessageLine from "./messageLine";
-import type { Theme } from "@emotion/react";
 
 interface InterviewHistoryProps {
   messages: Message[];
 }
 
-const getStyle = (role: Role): SxProps<Theme> => {
-  return {
-    alignSelf: role == "user" ? "flex-start" : "flex-end",
-    padding: 2,
-  };
-};
-
 const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <Stack spacing={2}>
       {messages.map((message) => (
-        <Paper elevation={2} sx={getStyle(message.role)}>
-          <MessageLine key={message.content} message={message} />
-        </Paper>
+        <MessageLine key={message.id} message={message} />
       ))}
+      <div ref={messagesEndRef} />
     </Stack>
   );
 };

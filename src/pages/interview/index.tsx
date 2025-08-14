@@ -1,18 +1,15 @@
 import { Box } from "@mui/material";
 import Interview from "./interview";
-import useOpenAIChat from "../../hooks/useOpenAI";
+import useGiftRecommendationFlow from "../../hooks/useGiftRecommendationFlow";
 import PageContainer from "../../components/pageContainer";
 
 const InterviewContainer = () => {
-  const { messages, loading, sendMessage } = useOpenAIChat();
-  const handleUserPrompt = (text: string) => {
-    console.log(`Received user prompt ${text}`)
-    sendMessage(text);
-  };
+  const { messages, loading, sendMessage } = useGiftRecommendationFlow();
+  const handleUserPrompt = (text: string) => sendMessage(text);
 
   return (
     <PageContainer loading={loading}>
-      <Box padding={2}>
+      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Interview messages={messages} onUserPropmt={handleUserPrompt} />
       </Box>
     </PageContainer>

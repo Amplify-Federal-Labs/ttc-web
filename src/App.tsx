@@ -1,4 +1,3 @@
-import "./App.css";
 import Interview from "./pages/interview";
 
 function App() {
