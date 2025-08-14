@@ -9,6 +9,7 @@ interface InterviewHistoryProps {
 
 const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -19,12 +20,22 @@ const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
   }, [messages]);
 
   return (
-    <Stack spacing={2}>
-      {messages.map((message) => (
-        <MessageLine key={message.id} message={message} />
-      ))}
-      <div ref={messagesEndRef} />
-    </Stack>
+    <div 
+      ref={containerRef}
+      style={{
+        minHeight: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: messages.length === 0 ? 'flex-end' : 'flex-start'
+      }}
+    >
+      <Stack spacing={2} sx={{ flexGrow: 1 }}>
+        {messages.map((message) => (
+          <MessageLine key={message.id} message={message} />
+        ))}
+        <div ref={messagesEndRef} />
+      </Stack>
+    </div>
   );
 };
 

@@ -109,6 +109,46 @@ export const LongConversation: Story = {
         role: 'assistant',
         content: 'Perfect! A tech-savvy gamer who appreciates quality peripherals. What\'s your budget range for this graduation gift?',
       },
+      {
+        id: v4(),
+        role: 'user',
+        content: 'He loves gaming, especially PC gaming, and he\'s really into mechanical keyboards and tech gadgets.',
+      },
+      {
+        id: v4(),
+        role: 'assistant',
+        content: 'Perfect! A tech-savvy gamer who appreciates quality peripherals. What\'s your budget range for this graduation gift?',
+      },
+      {
+        id: v4(),
+        role: 'user',
+        content: 'He loves gaming, especially PC gaming, and he\'s really into mechanical keyboards and tech gadgets.',
+      },
+      {
+        id: v4(),
+        role: 'assistant',
+        content: 'Perfect! A tech-savvy gamer who appreciates quality peripherals. What\'s your budget range for this graduation gift?',
+      },
+      {
+        id: v4(),
+        role: 'user',
+        content: 'He loves gaming, especially PC gaming, and he\'s really into mechanical keyboards and tech gadgets.',
+      },
+      {
+        id: v4(),
+        role: 'assistant',
+        content: 'Perfect! A tech-savvy gamer who appreciates quality peripherals. What\'s your budget range for this graduation gift?',
+      },
+      {
+        id: v4(),
+        role: 'user',
+        content: 'He loves gaming, especially PC gaming, and he\'s really into mechanical keyboards and tech gadgets.',
+      },
+      {
+        id: v4(),
+        role: 'assistant',
+        content: 'Perfect! A tech-savvy gamer who appreciates quality peripherals. What\'s your budget range for this graduation gift?',
+      },
     ],
   },
 };

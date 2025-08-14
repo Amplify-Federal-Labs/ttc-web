@@ -21,9 +21,6 @@ const Interview = ({ messages, onUserPropmt }: InterviewProps) => {
           overflow: "auto",
           minHeight: 0,
           padding: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end'
         }}
       >
         <InterviewHistory messages={messages} />
