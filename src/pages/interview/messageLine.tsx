@@ -28,7 +28,7 @@ const hasMarkdown = (content: string): boolean => {
     /^#{1,6}\s/m, // Headers
     /\*\*.*\*\*/,  // Bold
     /\*.*\*/,      // Italic
-    /^\s*[\*\-\+]\s/m, // Bullet lists
+    /^\s*[*\-+]\s/m, // Bullet lists
     /^\s*\d+\.\s/m,    // Numbered lists
     /```[\s\S]*```/,   // Code blocks
     /`.*`/,            // Inline code

@@ -31,4 +31,4 @@ jobs:
       - name: Deploy to Firebase Hosting
         run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
         env: 
-          VITE_OPEN_AI_APIKEY: ${{ vars.VITE_OPEN_AI_APIKEY }}
+          VITE_OPEN_AI_APIKEY: ${{ secrets.VITE_OPEN_AI_APIKEY }}
