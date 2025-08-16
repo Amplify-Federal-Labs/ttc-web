@@ -2,7 +2,7 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   setPersistence,
-  browserSessionPersistence,
+  browserLocalPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -13,10 +13,13 @@ import { auth } from './firebaseConfig';
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
+// Configure providers for persistence
+// All sign-in methods now use browserLocalPersistence to maintain sessions across browser restarts
+
 // Sign in with Google functionality
 export const signInWithGoogle = async () => {
   try {
-    return setPersistence(auth, browserSessionPersistence).then(async () => {
+    return setPersistence(auth, browserLocalPersistence).then(async () => {
       const result = await signInWithPopup(auth, googleProvider);
       return {
         success: true,
@@ -36,7 +39,7 @@ export const signInWithGoogle = async () => {
 // Sign in with GitHub functionality
 export const signInWithGithub = async () => {
   try {
-    return setPersistence(auth, browserSessionPersistence).then(async () => {
+    return setPersistence(auth, browserLocalPersistence).then(async () => {
       const result = await signInWithPopup(auth, githubProvider);
       return {
         success: true,
@@ -56,7 +59,7 @@ export const signInWithGithub = async () => {
 // Sign in with email and password
 export async function signInWithCredentials(email: string, password: string) {
   try {
-    return setPersistence(auth, browserSessionPersistence).then(async () => {
+    return setPersistence(auth, browserLocalPersistence).then(async () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       return {
         success: true,

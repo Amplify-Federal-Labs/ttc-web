@@ -92,7 +92,8 @@ src/
 - **Real-time Auth**: Firebase auth state changes automatically update OpenAI client
 
 ### 🔐 **Security & Authentication**
-- **Firebase Authentication**: Google and GitHub OAuth providers
+- **Firebase Authentication**: Google and GitHub OAuth providers with browserLocalPersistence
+- **Session Persistence**: Users stay logged in across browser sessions and restarts
 - **Secure API Proxy**: Backend handles OpenAI API keys, frontend uses JWT tokens
 - **Environment-based Config**: VITE_BACKEND_URL for proxy endpoint configuration
 - **Persistent Auth State**: onAuthStateChanged maintains authenticated OpenAI client
