@@ -11,6 +11,7 @@ A sophisticated gift recommendation application powered by conversational AI tha
 - **📱 Modern UI**: Material-UI components with responsive design and smooth scrolling
 - **🔄 Smart Transitions**: SDK native handoff detection with automatic agent transitions
 - **🔐 Secure Authentication**: Firebase Auth with Google/GitHub providers and JWT-secured API proxy
+- **💾 Session Persistence**: Users stay logged in across browser sessions with localStorage persistence
 - **⚡ Real-time Auth State**: Persistent OpenAI client management with automatic auth synchronization
 
 ## 🏗️ Architecture
