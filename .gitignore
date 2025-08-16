@@ -30,3 +30,4 @@ storybook-static
 .firebase
 
 converage
+firebaseConfig.json
