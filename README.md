@@ -5,21 +5,26 @@ A sophisticated gift recommendation application powered by conversational AI tha
 ## ✨ Features
 
 - **🤖 Dual-Agent AI System**: Interview Agent conducts natural conversations to build recipient profiles, Concierge Agent generates thoughtful recommendations
-- **💬 Conversational Interface**: Chat-based experience with seamless agent handoff
+- **💬 Conversational Interface**: Chat-based experience with seamless agent handoff using OpenAI Agents SDK
 - **📝 Personalized Notes**: AI-generated heartfelt messages to accompany each gift suggestion
 - **🎨 Rich Formatting**: Markdown support for beautifully formatted recommendations
 - **📱 Modern UI**: Material-UI components with responsive design and smooth scrolling
-- **🔄 Smart Transitions**: Automatic detection of interview completion with seamless handoff
+- **🔄 Smart Transitions**: SDK native handoff detection with automatic agent transitions
+- **🔐 Secure Authentication**: Firebase Auth with Google/GitHub providers and JWT-secured API proxy
+- **⚡ Real-time Auth State**: Persistent OpenAI client management with automatic auth synchronization
 
 ## 🏗️ Architecture
 
 ### Agent System
+- **AgentOrchestrator**: Main orchestration using OpenAI Agents SDK with native handoffs
 - **Interview Agent**: Conducts comprehensive interviews to understand recipients
 - **Concierge Agent**: Creates categorized gift recommendations with personalized notes
-- **Base Agent**: Shared OpenAI integration and message management
+- **AuthenticatedOpenAIService**: Manages persistent OpenAI client with Firebase auth integration
 
 ### Key Components
-- **Gift Recommendation Flow**: Orchestrates dual-agent conversation
+- **Gift Recommendation Flow**: Orchestrates dual-agent conversation with SDK native transitions
+- **Authentication Service**: Real-time auth state management with automatic client updates
+- **Backend API Proxy**: Secure OpenAI API access with JWT token authentication
 - **Markdown Rendering**: Rich text display for formatted recommendations
 - **Scrollable Chat**: Bottom-aligned messages that grow upward naturally
 - **Profile Generation**: Structured data extraction for AI processing
@@ -29,7 +34,8 @@ A sophisticated gift recommendation application powered by conversational AI tha
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- OpenAI API key
+- Firebase project with Authentication enabled
+- Backend API proxy server with OpenAI API key
 
 ### Installation
 
@@ -47,15 +53,28 @@ A sophisticated gift recommendation application powered by conversational AI tha
 3. **Environment Setup**
    Create a `.env` file in the root directory:
    ```env
-   VITE_OPENAI_API_KEY=your_openai_api_key_here
+   VITE_BACKEND_URL=https://your-backend-api-proxy.com/v1
    ```
 
-4. **Start development server**
+4. **Firebase Configuration**
+   Add your Firebase configuration to `firebaseConfig.json`:
+   ```json
+   {
+     "apiKey": "your-firebase-api-key",
+     "authDomain": "your-project.firebaseapp.com",
+     "projectId": "your-project-id",
+     "storageBucket": "your-project.appspot.com",
+     "messagingSenderId": "123456789",
+     "appId": "your-app-id"
+   }
+   ```
+
+5. **Start development server**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser**
+6. **Open your browser**
    Navigate to `http://localhost:5173` (or the port shown in terminal)
 
 ## 🛠️ Development
@@ -66,6 +85,9 @@ A sophisticated gift recommendation application powered by conversational AI tha
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint for code quality
+- `npm run test` - Run unit tests with Vitest
+- `npm run test:ui` - Run tests with UI interface
+- `npm run coverage` - Generate test coverage report
 - `npm run storybook` - Start Storybook for component development
 
 ### Project Structure
@@ -73,9 +95,15 @@ A sophisticated gift recommendation application powered by conversational AI tha
 ```
 src/
 ├── agents/               # AI agent classes and logic
-│   ├── baseAgent.ts     # Base agent with OpenAI integration
-│   ├── interviewAgent.ts # Interview conductor
-│   └── conciergeAgent.ts # Gift recommendation specialist
+│   ├── agentOrchestrator.ts # Main orchestration with OpenAI Agents SDK
+│   ├── baseAgent.ts     # Legacy base agent (deprecated)
+│   ├── interviewAgent.ts # Legacy interview conductor (deprecated)
+│   └── conciergeAgent.ts # Legacy gift specialist (deprecated)
+├── services/            # Core services
+│   └── authenticatedOpenAIService.ts # Auth state-driven OpenAI client
+├── firebase/            # Firebase integration
+│   ├── firebaseConfig.ts # Firebase app configuration
+│   └── auth.ts          # Authentication providers
 ├── hooks/               # React hooks
 │   └── useGiftRecommendationFlow.ts # Main agent orchestration
 ├── pages/interview/     # Chat interface components
@@ -93,11 +121,12 @@ src/
 
 ## 📋 User Flow
 
-1. **Start Interview**: User begins conversation with Interview Agent
-2. **Profile Building**: Agent asks about recipient, occasion, preferences, and budget
-3. **Profile Generation**: AI creates structured markdown summary
-4. **Seamless Handoff**: Transition message appears, Concierge Agent takes over
-5. **Gift Recommendations**: Categorized suggestions with personalized notes:
+1. **Authentication**: User signs in with Google or GitHub via Firebase Auth
+2. **Start Interview**: User begins conversation with Interview Agent
+3. **Profile Building**: Agent asks about recipient, occasion, preferences, and budget
+4. **Profile Generation**: AI creates structured markdown summary
+5. **SDK Native Handoff**: Automatic transition detected via OpenAI Agents SDK
+6. **Gift Recommendations**: Categorized suggestions with personalized notes:
    - Perfect Match: Gifts aligned with main interests
    - Thoughtful Surprise: Unexpected but meaningful options
    - Practical Delight: Useful items for daily life/hobbies
@@ -132,14 +161,18 @@ src/
 - **TypeScript** - Type-safe development
 - **Material-UI v7** - Component library and theming
 - **Vite** - Fast build tool and dev server
-- **OpenAI API** - GPT-4 for conversational AI
+- **OpenAI Agents SDK** - Multi-agent AI system with native handoffs
+- **Firebase Auth** - Authentication with Google/GitHub providers
 - **React Markdown** - Rich text rendering
+- **Vitest** - Fast unit testing framework
 
 ### Key Patterns
 - **Custom Hooks** - Encapsulated state management
-- **Agent Architecture** - Modular AI system design
+- **Agent Architecture** - OpenAI Agents SDK with native handoffs
+- **Service Layer** - AuthenticatedOpenAIService for client management
 - **Component Composition** - Reusable UI building blocks
 - **Type Safety** - Comprehensive TypeScript coverage
+- **Auth State Management** - Firebase onAuthStateChanged integration
 
 ## 📝 Documentation
 
@@ -150,7 +183,11 @@ src/
 
 The application uses environment variables for configuration:
 
-- `VITE_OPENAI_API_KEY` - OpenAI API key for AI functionality
+- `VITE_BACKEND_URL` - Backend API proxy endpoint for secure OpenAI API access
+
+Additional configuration:
+- `firebaseConfig.json` - Firebase project configuration for authentication
+- Backend proxy server required for OpenAI API key security
 
 ## 🚦 Deployment
 

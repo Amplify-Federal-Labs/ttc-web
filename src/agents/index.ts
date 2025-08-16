@@ -1,7 +1,5 @@
-import interviewAgent from './interviewAgent';
-import conciergeAgent from './conciergeAgent';
+import { AgentOrchestrator } from './agentOrchestrator';
 
 export {
-    interviewAgent,
-    conciergeAgent
+    AgentOrchestrator
 }
