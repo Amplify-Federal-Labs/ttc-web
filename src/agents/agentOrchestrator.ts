@@ -1,21 +1,40 @@
-import { Agent, run, type AgentInputItem } from '@openai/agents';
+import { Agent, handoff, run, RunContext, type AgentInputItem } from '@openai/agents';
+import { RECOMMENDED_PROMPT_PREFIX } from '@openai/agents-core/extensions';
+import { z } from 'zod';
 import { INTERVIEW_AGENT_PROMPT, CONCIERGE_AGENT_PROMPT } from '../prompts/systemPrompts';
 import type { Role } from '../types';
 import { authenticatedOpenAIService } from '../services/authenticatedOpenAIService';
+
+const ProfileData = z.object({ text: z.string() });
+type ProfileData = z.infer<typeof ProfileData>;
+
+async function onHandoff(
+  _ctx: RunContext<ProfileData>,
+  input: ProfileData | undefined,
+) {
+  // TODO: Save the recipient profile in Firestore for future reference
+  console.log(`Concierge agent called with input: ${input?.text}`);
+}
 
 // Helper function to create agents
 const createAgents = () => {
   const conciergeAgent = new Agent({
     name: 'Concierge Agent',
-    instructions: CONCIERGE_AGENT_PROMPT,
+    instructions: `${RECOMMENDED_PROMPT_PREFIX}
+  ${CONCIERGE_AGENT_PROMPT}`,
     handoffDescription: 'Expert at providing personalized gift recommendations with thoughtful notes based on recipient profiles',
     model: 'gpt-4o'
   });
 
+  const conciergeHandoff = handoff(conciergeAgent, {
+    onHandoff,
+    inputType: ProfileData
+  });
+
   const interviewAgent = Agent.create({
-    name: 'Interview Agent', 
+    name: 'Interview Agent',
     instructions: INTERVIEW_AGENT_PROMPT,
-    handoffs: [conciergeAgent],
+    handoffs: [conciergeHandoff],
     model: 'gpt-4o'
   });
 
@@ -32,9 +51,9 @@ export class AgentOrchestrator {
     this.currentAgentName = 'Interview Agent';
   }
 
-  async sendMessage(userMessage: string): Promise<{ 
-    response: string; 
-    agent: string; 
+  async sendMessage(userMessage: string): Promise<{
+    response: string;
+    agent: string;
     handoffOccurred: boolean;
     conversationHistory: Array<{ role: Role; content: string; agent: string }>;
   }> {
@@ -46,13 +65,13 @@ export class AgentOrchestrator {
     });
 
     let handoffOccurred = false;
-    
+
     try {
       // Check if we have an authenticated client
       if (!authenticatedOpenAIService.isAuthenticated()) {
         throw new Error('No authenticated user. Please log in to continue.');
       }
-      
+
       // Create agents (client is already set as default by the service)
       const { interviewAgent } = createAgents();
 
@@ -108,7 +127,7 @@ export class AgentOrchestrator {
 
     } catch (error) {
       console.error('Error in agent orchestrator:', error);
-      
+
       const errorMessage = 'I apologize, but I encountered an error. Please try again.';
       this.conversationHistory.push({
         role: 'assistant',
@@ -131,7 +150,7 @@ export class AgentOrchestrator {
     // This might be in result.trace, result.events, or similar SDK properties
     const resultObj = result as { trace?: { events?: Array<{ type?: string; name?: string }> } };
     if (resultObj.trace?.events) {
-      return resultObj.trace.events.some((event) => 
+      return resultObj.trace.events.some((event) =>
         event.type === 'handoff' || (event.type === 'tool_call' && event.name?.includes('transfer_to'))
       );
     }
