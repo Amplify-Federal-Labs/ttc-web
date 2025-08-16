@@ -19,7 +19,8 @@ A gift recommendation application that leverages conversational AI to create per
 ### 🏗️ **Technical Stack**
 - **Frontend**: React + TypeScript + Material-UI
 - **State Management**: Custom React hooks with agent orchestration
-- **AI Integration**: OpenAI API with structured prompts
+- **AI Integration**: OpenAI Agents SDK with backend proxy for secure API key management
+- **Authentication**: Firebase Auth with Google/GitHub providers
 - **Architecture**: Component-based with clean separation of concerns
 
 ### 📱 **User Experience Flow**
@@ -36,10 +37,16 @@ A gift recommendation application that leverages conversational AI to create per
 ```
 src/
 ├── agents/
-│   ├── baseAgent.ts          # Base agent class with OpenAI integration
-│   ├── interviewAgent.ts     # Interview conductor
-│   ├── conciergeAgent.ts     # Gift recommendation specialist
+│   ├── agentOrchestrator.ts  # Main agent orchestration with OpenAI Agents SDK
+│   ├── baseAgent.ts          # Legacy base agent class (deprecated)
+│   ├── interviewAgent.ts     # Legacy interview conductor (deprecated)
+│   ├── conciergeAgent.ts     # Legacy gift recommendation specialist (deprecated)
 │   └── index.ts              # Agent exports
+├── services/
+│   └── authenticatedOpenAIService.ts # Auth state-driven OpenAI client management
+├── firebase/
+│   ├── firebaseConfig.ts     # Firebase app configuration
+│   └── auth.ts               # Authentication providers (Google/GitHub)
 ├── hooks/
 │   ├── useInterviewAgent.ts         # Legacy single-agent hook
 │   └── useGiftRecommendationFlow.ts # Main dual-agent orchestration
@@ -61,6 +68,14 @@ src/
 - **ADR-001**: Use Gift Recommendation Flow with Conversation Continuation
   - Decision to use seamless chat handoff between agents
   - Maintains conversation context and natural user experience
+- **ADR-002**: OpenAI Agents SDK with Secure Backend Proxy
+  - Use @openai/agents SDK for multi-agent functionality with native handoffs
+  - Implement backend proxy to secure API keys from frontend exposure
+  - Firebase JWT authentication for authorized API access
+- **ADR-003**: Auth State-Driven OpenAI Client Management
+  - Use Firebase onAuthStateChanged for real-time auth synchronization
+  - Maintain persistent authenticated OpenAI client instead of per-request creation
+  - Automatic client lifecycle management (create on login, clear on logout)
 
 ### 🎨 **UI/UX Highlights**
 - **Bottom-aligned messages**: Chat grows upward naturally
@@ -70,7 +85,15 @@ src/
 - **Markdown rendering**: Rich text support for formatted recommendations
 
 ### 🔄 **Agent Communication**
-- **Profile-based handoff**: Interview agent generates structured profile
-- **Context preservation**: Full conversation history maintained
-- **Automatic transition**: Smart detection of interview completion
-- **Error handling**: Graceful fallback for agent failures
+- **SDK Native Handoffs**: Uses OpenAI Agents SDK built-in handoff capabilities
+- **Context preservation**: Full conversation history maintained via AgentInputItem[]
+- **Automatic transition**: SDK native handoff detection via trace events
+- **Error handling**: Graceful fallback for agent failures and auth issues
+- **Real-time Auth**: Firebase auth state changes automatically update OpenAI client
+
+### 🔐 **Security & Authentication**
+- **Firebase Authentication**: Google and GitHub OAuth providers
+- **Secure API Proxy**: Backend handles OpenAI API keys, frontend uses JWT tokens
+- **Environment-based Config**: VITE_BACKEND_URL for proxy endpoint configuration
+- **Persistent Auth State**: onAuthStateChanged maintains authenticated OpenAI client
+- **Automatic Token Refresh**: Service handles JWT token lifecycle management

@@ -7,7 +7,7 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
-    readonly VITE_OPEN_AI_APIKEY: string
+    readonly VITE_BACKEND_URL: string
     // more env variables...
 }
 

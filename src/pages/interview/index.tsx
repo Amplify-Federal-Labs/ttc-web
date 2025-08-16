@@ -1,10 +1,10 @@
 import { Box } from "@mui/material";
 import Interview from "./interview";
-import useGiftRecommendationFlow from "../../hooks/useGiftRecommendationFlow";
+import useAgentSDKFlow from "../../hooks/useAgentSDKFlow";
 import PageContainer from "../../components/pageContainer";
 
 const InterviewContainer = () => {
-  const { messages, loading, sendMessage } = useGiftRecommendationFlow();
+  const { messages, loading, sendMessage } = useAgentSDKFlow();
   const handleUserPrompt = (text: string) => sendMessage(text);
 
   return (
