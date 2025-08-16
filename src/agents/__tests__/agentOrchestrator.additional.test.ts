@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the modules first
@@ -47,9 +48,8 @@ describe('AgentOrchestrator - Additional Coverage', () => {
     it('should handle empty user message', async () => {
       const emptyMessage = '';
       mockRun.mockResolvedValue({
-        finalOutput: 'I received an empty message. How can I help you?',
-        trace: { events: [] }
-      });
+        finalOutput: 'I received an empty message. How can I help you?'
+      } as any);
 
       const result = await orchestrator.sendMessage(emptyMessage);
 
@@ -61,9 +61,8 @@ describe('AgentOrchestrator - Additional Coverage', () => {
     it('should handle very long user message', async () => {
       const longMessage = 'a'.repeat(10000);
       mockRun.mockResolvedValue({
-        finalOutput: 'I understand your detailed message.',
-        trace: { events: [] }
-      });
+        finalOutput: 'I understand your detailed message.'
+      } as any);
 
       const result = await orchestrator.sendMessage(longMessage);
 
@@ -73,9 +72,8 @@ describe('AgentOrchestrator - Additional Coverage', () => {
 
     it('should handle undefined finalOutput from SDK', async () => {
       mockRun.mockResolvedValue({
-        finalOutput: undefined,
-        trace: { events: [] }
-      });
+        finalOutput: undefined
+      } as any);
 
       const result = await orchestrator.sendMessage('Test message');
 
@@ -84,10 +82,10 @@ describe('AgentOrchestrator - Additional Coverage', () => {
     });
 
     it('should handle null trace in SDK response', async () => {
-      mockRun.mockResolvedValue({
-        finalOutput: 'Response',
-        trace: null
-      });
+      const mockResult = { finalOutput: 'Response' } as any;
+      mockResult.trace = null;
+      
+      mockRun.mockResolvedValue(mockResult);
 
       const result = await orchestrator.sendMessage('Test message');
 
@@ -110,41 +108,38 @@ describe('AgentOrchestrator - Additional Coverage', () => {
   describe('handoff detection edge cases', () => {
     it('should detect handoff with transfer_to tool name variations', async () => {
       // These are direct tests of the private method, no API call needed
-      const result1 = {
-        trace: { events: [{ type: 'tool_call', name: 'transfer_to_gift_concierge' }] }
-      };
-      const result2 = {
-        trace: { events: [{ type: 'tool_call', name: 'transfer_to_concierge_agent' }] }
-      };
+      const result1 = {} as any;
+      result1.trace = { events: [{ type: 'tool_call', name: 'transfer_to_gift_concierge' }] };
+      
+      const result2 = {} as any;
+      result2.trace = { events: [{ type: 'tool_call', name: 'transfer_to_concierge_agent' }] };
 
       expect(orchestrator['detectHandoffFromResult'](result1)).toBe(true);
       expect(orchestrator['detectHandoffFromResult'](result2)).toBe(true);
     });
 
     it('should not detect handoff for non-transfer tool calls', async () => {
-      const result = {
-        trace: { 
-          events: [
-            { type: 'tool_call', name: 'get_weather' },
-            { type: 'tool_call', name: 'search_products' },
-            { type: 'llm_call' }
-          ] 
-        }
+      const result = {} as any;
+      result.trace = { 
+        events: [
+          { type: 'tool_call', name: 'get_weather' },
+          { type: 'tool_call', name: 'search_products' },
+          { type: 'llm_call' }
+        ] 
       };
 
       expect(orchestrator['detectHandoffFromResult'](result)).toBe(false);
     });
 
     it('should handle mixed event types correctly', async () => {
-      const result = {
-        trace: { 
-          events: [
-            { type: 'llm_call' },
-            { type: 'tool_call', name: 'get_weather' },
-            { type: 'tool_call', name: 'transfer_to_concierge' },
-            { type: 'handoff' }
-          ] 
-        }
+      const result = {} as any;
+      result.trace = { 
+        events: [
+          { type: 'llm_call' },
+          { type: 'tool_call', name: 'get_weather' },
+          { type: 'tool_call', name: 'transfer_to_concierge' },
+          { type: 'handoff' }
+        ] 
       };
 
       expect(orchestrator['detectHandoffFromResult'](result)).toBe(true);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock the modules first
@@ -29,6 +30,7 @@ vi.mock('../../services/authenticatedOpenAIService', () => ({
 // Now import the actual implementations
 import { AgentOrchestrator } from '../agentOrchestrator';
 import { run } from '@openai/agents';
+import { OpenAI } from 'openai';
 import { authenticatedOpenAIService } from '../../services/authenticatedOpenAIService';
 
 const mockRun = vi.mocked(run);
@@ -71,9 +73,8 @@ describe('AgentOrchestrator', () => {
       const mockResponse = 'Hi! I\'d be happy to help you find the perfect gift. Could you tell me about the person you\'re shopping for?';
       
       mockRun.mockResolvedValue({
-        finalOutput: mockResponse,
-        trace: { events: [] }
-      });
+        finalOutput: mockResponse
+      } as any);
 
       // Execute
       const result = await orchestrator.sendMessage(userMessage);
@@ -103,14 +104,18 @@ describe('AgentOrchestrator', () => {
       const userMessage = 'I think I\'ve told you enough about my friend';
       const mockResponse = 'Perfect! Based on your friend\'s love for cooking and your close relationship, here are some thoughtful gift recommendations...';
       
-      mockRun.mockResolvedValue({
-        finalOutput: mockResponse,
-        trace: { 
-          events: [
-            { type: 'tool_call', name: 'transfer_to_concierge_agent' }
-          ] 
-        }
-      });
+      // Mock result that will trigger handoff detection
+      const mockResult = {
+        finalOutput: mockResponse
+      };
+      // Add trace property for handoff detection
+      (mockResult as any).trace = { 
+        events: [
+          { type: 'tool_call', name: 'transfer_to_concierge_agent' }
+        ] 
+      };
+      
+      mockRun.mockResolvedValue(mockResult as any);
 
       // Execute
       const result = await orchestrator.sendMessage(userMessage);
@@ -125,9 +130,8 @@ describe('AgentOrchestrator', () => {
       // Setup
       const userMessage = 'Test message';
       mockRun.mockResolvedValue({
-        finalOutput: 'Test response',
-        trace: { events: [] }
-      });
+        finalOutput: 'Test response'
+      } as any);
 
       // Execute
       await orchestrator.sendMessage(userMessage);
@@ -153,17 +157,15 @@ describe('AgentOrchestrator', () => {
     it('should build conversation items correctly for multiple messages', async () => {
       // Setup - send first message
       mockRun.mockResolvedValue({
-        finalOutput: 'First response',
-        trace: { events: [] }
-      });
+        finalOutput: 'First response'
+      } as any);
       
       await orchestrator.sendMessage('First message');
       
       // Setup - send second message
       mockRun.mockResolvedValue({
-        finalOutput: 'Second response',
-        trace: { events: [] }
-      });
+        finalOutput: 'Second response'
+      } as any);
 
       // Execute
       await orchestrator.sendMessage('Second message');
@@ -248,9 +250,8 @@ describe('AgentOrchestrator', () => {
       ];
 
       mockRun.mockResolvedValue({
-        finalOutput: 'Response',
-        trace: { events: [] }
-      });
+        finalOutput: 'Response'
+      } as any);
 
       // Execute
       await orchestrator.sendMessage('New message');
@@ -276,12 +277,11 @@ describe('AgentOrchestrator', () => {
 
   describe('detectHandoffFromResult', () => {
     it('should detect handoff from tool_call event', () => {
-      const result = {
-        trace: {
-          events: [
-            { type: 'tool_call', name: 'transfer_to_concierge_agent' }
-          ]
-        }
+      const result = {} as any;
+      result.trace = {
+        events: [
+          { type: 'tool_call', name: 'transfer_to_concierge_agent' }
+        ]
       };
 
       const isHandoff = orchestrator['detectHandoffFromResult'](result);
@@ -289,12 +289,11 @@ describe('AgentOrchestrator', () => {
     });
 
     it('should detect handoff from handoff event', () => {
-      const result = {
-        trace: {
-          events: [
-            { type: 'handoff' }
-          ]
-        }
+      const result = {} as any;
+      result.trace = {
+        events: [
+          { type: 'handoff' }
+        ]
       };
 
       const isHandoff = orchestrator['detectHandoffFromResult'](result);
@@ -302,13 +301,12 @@ describe('AgentOrchestrator', () => {
     });
 
     it('should not detect handoff when no relevant events', () => {
-      const result = {
-        trace: {
-          events: [
-            { type: 'llm_call' },
-            { type: 'tool_call', name: 'get_weather' }
-          ]
-        }
+      const result = {} as any;
+      result.trace = {
+        events: [
+          { type: 'llm_call' },
+          { type: 'tool_call', name: 'get_weather' }
+        ]
       };
 
       const isHandoff = orchestrator['detectHandoffFromResult'](result);
@@ -375,19 +373,15 @@ describe('AgentOrchestrator', () => {
   describe('conversation flow integration', () => {
     it('should maintain conversation context across multiple messages', async () => {
       // Setup responses
+      const mockResult1 = { finalOutput: 'First response' } as any;
+      const mockResult2 = { finalOutput: 'Second response' } as any;
+      const mockResult3 = { finalOutput: 'Third response with handoff' } as any;
+      mockResult3.trace = { events: [{ type: 'tool_call', name: 'transfer_to_concierge_agent' }] };
+      
       mockRun
-        .mockResolvedValueOnce({
-          finalOutput: 'First response',
-          trace: { events: [] }
-        })
-        .mockResolvedValueOnce({
-          finalOutput: 'Second response',
-          trace: { events: [] }
-        })
-        .mockResolvedValueOnce({
-          finalOutput: 'Third response with handoff',
-          trace: { events: [{ type: 'tool_call', name: 'transfer_to_concierge_agent' }] }
-        });
+        .mockResolvedValueOnce(mockResult1)
+        .mockResolvedValueOnce(mockResult2)
+        .mockResolvedValueOnce(mockResult3);
 
       // Execute conversation
       const result1 = await orchestrator.sendMessage('First message');
