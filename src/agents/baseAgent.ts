@@ -1,13 +1,27 @@
-import OpenAI from "openai";
+import { type AxiosInstance } from "axios";
 import type { Message } from "../types";
 import { v4 } from "uuid";
+import { auth } from "../firebase/firebaseConfig";
+
+interface OpenAIMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
+}
+
+interface OpenAIResponse {
+    choices: Array<{
+        message: {
+            content: string | null;
+        };
+    }>;
+}
 
 class BaseAgent {
-    client: OpenAI;
+    private axiosClient: AxiosInstance;
     messages: Message[];
 
-    constructor(client: OpenAI, systemPrompt: string, initialPrompt?: string) {
-        this.client = client;
+    constructor(axiosClient: AxiosInstance, systemPrompt: string, initialPrompt?: string) {
+        this.axiosClient = axiosClient;
         this.messages = [
             {
                 id: v4(),
@@ -33,14 +47,30 @@ class BaseAgent {
     }
 
     async sendMessage(content: string): Promise<void> {
+        const idToken = await auth.currentUser?.getIdToken();
+
         try {
             this.messages = [...this.messages, { id: v4(), role: 'user', content }];
 
-            // Make API call to OpenAI
-            const completion = await this.client.chat.completions.create({
+            const openAIMessages: OpenAIMessage[] = this.messages.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            }));
+
+            const body = {
                 model: 'gpt-4o',
-                messages: [...this.messages]
-            });
+                messages: openAIMessages
+            };
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${idToken}`
+                }
+            };
+            const response = await this.axiosClient.post<OpenAIResponse>(
+                '/v1/chat/completions', body, config
+            );
+
+            const completion = response.data;
 
             this.messages = [
                 ...this.messages,

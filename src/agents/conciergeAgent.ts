@@ -1,12 +1,16 @@
 import BaseAgent from "./baseAgent";
 import { CONCIERGE_AGENT_PROMPT } from "../prompts/systemPrompts";
-import OpenAI from "openai";
+import axios from "axios";
 
-const client = new OpenAI({
-    apiKey: import.meta.env.VITE_OPEN_AI_APIKEY,
-    dangerouslyAllowBrowser: true
+const baseURL = import.meta.env.VITE_BACKEND_URL || 'https://api.openai.com';
+
+const axiosClient = axios.create({
+    baseURL,
+    headers: {
+        'Content-Type': 'application/json',
+    }
 });
 
-const conciergeAgent = new BaseAgent(client, CONCIERGE_AGENT_PROMPT);
+const conciergeAgent = new BaseAgent(axiosClient, CONCIERGE_AGENT_PROMPT);
 
 export default conciergeAgent;
