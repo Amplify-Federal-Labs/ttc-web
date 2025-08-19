@@ -1,5 +1,6 @@
 import { AppProvider } from "@toolpad/core/AppProvider";
 import Interview from "./pages/interview";
+import VoiceInterview from "./pages/voidInterview";
 import SessionContext, { type Session } from "./SessionContext";
 import { CircularProgress } from "@mui/material";
 import SignIn from "./signIn";
@@ -56,7 +57,7 @@ function App() {
     <SessionContext.Provider value={sessionContextValue}>
       <AppProvider>
         {session ? (
-          <Interview />
+          <VoiceInterview />
         ) : (
           <SignIn onSuccess={handleSignInSuccess} onFail={handleSignInFail} />
         )}

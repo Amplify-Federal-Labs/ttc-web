@@ -1,5 +1,5 @@
 import { Agent, handoff, run, RunContext, type AgentInputItem } from '@openai/agents';
-import { RECOMMENDED_PROMPT_PREFIX } from '@openai/agents-core/extensions';
+import { RECOMMENDED_PROMPT_PREFIX, removeAllTools } from '@openai/agents-core/extensions';
 import { z } from 'zod';
 import { INTERVIEW_AGENT_PROMPT, CONCIERGE_AGENT_PROMPT } from '../prompts/systemPrompts';
 import type { Role } from '../types';
@@ -28,7 +28,8 @@ const createAgents = () => {
 
   const conciergeHandoff = handoff(conciergeAgent, {
     onHandoff,
-    inputType: ProfileData
+    inputType: ProfileData,
+    inputFilter: removeAllTools
   });
 
   const interviewAgent = Agent.create({
