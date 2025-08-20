@@ -105,3 +105,42 @@ export const LongConversation: Story = {
     ],
   },
 };
+
+export const MarkdownMessage: Story = {
+  args: {
+    messages: [
+      {
+        id: v4(),
+        role: 'assistant',
+        content: 'Hi! I\'m here to help you find the perfect gift. Let\'s start by talking about who you\'re shopping for.',
+      },
+      {
+        id: v4(),
+        role: 'user',
+        content: 'I\'m looking for a gift for my best friend who loves cooking.',
+      },
+      {
+        id: v4(),
+        role: 'assistant',
+        content: `Based on our conversation, here are some **perfect gift recommendations** for your cooking-enthusiast friend:
+
+## 🍳 **Perfect Match Gifts**
+- **High-Quality Chef's Knife**: A Wüsthof or Henckels 8-inch chef's knife ($80-120)
+- **Cast Iron Dutch Oven**: Le Creuset or Lodge for braising and bread baking ($60-300)
+
+## 🎁 **Thoughtful Surprises**
+- **Specialty Spice Collection**: Curated spices from around the world ($40-80)
+- **Personalized Cutting Board**: Custom engraved bamboo or walnut board ($30-60)
+
+## 📚 **Experience Options**
+- **Cooking Class**: Local culinary workshop or online masterclass ($50-150)
+- **Food & Wine Subscription**: Monthly delivery of artisanal products ($30-50/month)
+
+### Suggested Note:
+*"Your passion for cooking has always inspired me. I love how you turn simple ingredients into something magical, and how you bring people together around the table. This gift is my way of celebrating the joy and creativity you bring to everything you make."*
+
+Would you like me to elaborate on any of these suggestions?`,
+      },
+    ],
+  },
+};

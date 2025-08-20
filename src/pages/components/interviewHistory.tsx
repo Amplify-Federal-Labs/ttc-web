@@ -1,7 +1,8 @@
 import { Stack } from "@mui/material";
 import { useEffect, useRef } from "react";
 import type { Message } from "../../types";
-import MessageLine from "./messageLine";
+import UserMessageLine from "./userMessageLine";
+import AssistantMessageLine from "./assistantMessageLine";
 
 interface InterviewHistoryProps {
   messages: Message[];
@@ -30,9 +31,13 @@ const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
       }}
     >
       <Stack spacing={2}>
-        {messages.map((message) => (
-          <MessageLine key={message.id} message={message} />
-        ))}
+        {messages.map((message) =>
+          message.role == "user" ? (
+            <UserMessageLine key={message.id} message={message} />
+          ) : (
+            <AssistantMessageLine key={message.id} message={message} />
+          )
+        )}
         <div ref={messagesEndRef} />
       </Stack>
     </div>

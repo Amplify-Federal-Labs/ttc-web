@@ -10,14 +10,6 @@ const getColor = (role: Role) => {
   return role == "user" ? "primary" : "secondary";
 };
 
-const getStyle = (role: Role): SxProps<Theme> => {
-  return {
-    alignSelf: role == "user" ? "flex-start" : "flex-end",
-    padding: 2,
-    flexGrow: 4,
-  };
-};
-
 const hasMarkdown = (content: string): boolean => {
   const markdownPatterns = [
     /^#{1,6}\s/m, // Headers
@@ -41,7 +33,7 @@ const MessageLine = ({ message }: MessageLineProps) => {
   const isMarkdown = hasMarkdown(message.content);
 
   return (
-    <Paper elevation={2} sx={getStyle(message.role)}>
+    <>
       {isMarkdown ? (
         <ReactMarkdown
           components={{
@@ -104,7 +96,7 @@ const MessageLine = ({ message }: MessageLineProps) => {
           {message.content}
         </Typography>
       )}
-    </Paper>
+    </>
   );
 };
 

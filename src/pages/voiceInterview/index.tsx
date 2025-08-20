@@ -1,5 +1,5 @@
 import useVoiceAgent from "../../hooks/useVoiceAgent";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
 import InterviewHistory from "../components/interviewHistory";
 import PageContainer from "../../components/pageContainer";
 
@@ -7,10 +7,6 @@ const VoiceInterview = () => {
   console.log("Rendering VoiceInterview");
 
   const { loading, messages } = useVoiceAgent();
-
-  if (loading) {
-    return <CircularProgress />;
-  }
 
   return (
     <PageContainer loading={loading}>
