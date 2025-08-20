@@ -1,22 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { Message } from "../types"
-import { CONCIERGE_AGENT_PROMPT, INTERVIEW_AGENT_PROMPT } from "../prompts/systemPrompts";
-import { RECOMMENDED_PROMPT_PREFIX } from "@openai/agents-core/extensions";
-import { RealtimeAgent, RealtimeSession, type RealtimeItem, type RealtimeMessageItem } from "@openai/agents/realtime";
+import { RealtimeSession, type RealtimeItem, type RealtimeMessageItem } from "@openai/agents/realtime";
 import authenticatedOpenAIService from "../services/authenticatedAxiosClient";
+import { 
+    createConciergeAgent, 
+    createInterviewAgent, 
+    createRealtimeSession, 
+    connectAndSetupSession 
+} from "../agents/voiceSessionFactory";
+
+// Module-level session management to handle React.StrictMode double mounting
+let globalSession: RealtimeSession | null = null;
+let isInitializing = false;
+const messageUpdateCallbacks: Set<(messages: Message[]) => void> = new Set();
 
 const useVoiceAgent = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false);
-    const [session, setSession] = useState<RealtimeSession | null>();
 
-    const handleHistoryUpdated = (history: RealtimeItem[]) => {
-        const messages: Message[] = history
+    const handleHistoryUpdated = useCallback((history: RealtimeItem[]) => {
+        const processedMessages: Message[] = history
             .filter((item): item is RealtimeMessageItem => {
                 return typeof item == 'object';
             })
             .map((item: RealtimeMessageItem) => {
-                const textContent = item.content
+                const textContent = (item.content || [])
                     .map(contentItem => {
                         if ('text' in contentItem) {
                             return contentItem.text;
@@ -36,70 +44,80 @@ const useVoiceAgent = () => {
                 };
             });
 
-        setMessages(messages);
-    };
+        // Update all registered callbacks
+        messageUpdateCallbacks.forEach(callback => callback(processedMessages));
+    }, []);
 
     useEffect(() => {
+        // Register this component's setMessages callback
+        messageUpdateCallbacks.add(setMessages);
 
-        console.log("useVoiceAgent::useEffect");
+        // Initialize session if not already done
+        if (!globalSession && !isInitializing) {
+            console.log('No global session found and not initializing. Starting session creation...');
+            isInitializing = true;
+            setLoading(true);
 
-        if (!session) {
-            console.log('session not found. Initializing');
-
-            const conciergeAgent = new RealtimeAgent({
-                name: 'Concierge Agent',
-                instructions: `${RECOMMENDED_PROMPT_PREFIX}
-            ${CONCIERGE_AGENT_PROMPT}`,
-                handoffDescription: 'Expert at providing personalized gift recommendations with thoughtful notes based on recipient profiles',
-            });
-
-            const interviewAgent = new RealtimeAgent({
-                name: 'Interview Agent',
-                instructions: INTERVIEW_AGENT_PROMPT,
-                handoffs: [conciergeAgent],
-            });
-
-            const session1 = new RealtimeSession(interviewAgent, {
-                model: 'gpt-4o-realtime-preview-2025-06-03',
-                config: {
-                    inputAudioFormat: 'pcm16',
-                    outputAudioFormat: 'pcm16',
-                    inputAudioTranscription: {
-                        model: 'gpt-4o-mini-transcribe',
-                    },
-                },
-            });
+            const conciergeAgent = createConciergeAgent();
+            const interviewAgent = createInterviewAgent(conciergeAgent);
+            const newSession = createRealtimeSession(interviewAgent);
 
             const axioClient = authenticatedOpenAIService.getClient();
             axioClient!.post("/sessions")
-                .then((response) => {
+                .then(async (response) => {
                     const apiKey = response.data.client_secret.value;
-                    session1.connect({ apiKey })
-                        .then(() => {
-                            console.log('Session connected');
-                            setLoading(false);
-                            setSession(session1);
-
-                            session1.on('history_updated', handleHistoryUpdated);
-                        })
-                        .catch(console.error);
+                    try {
+                        await connectAndSetupSession(newSession, apiKey, handleHistoryUpdated);
+                        globalSession = newSession;
+                        setLoading(false);
+                        isInitializing = false;
+                    } catch (error) {
+                        console.error('Session connection failed:', error);
+                        setLoading(false);
+                        isInitializing = false;
+                    }
                 })
-                .catch(console.error);
+                .catch((error) => {
+                    console.error('API key request failed:', error);
+                    setLoading(false);
+                    isInitializing = false;
+                });
+        } else if (globalSession) {
+            // Session already exists, just set loading to false
+            setLoading(false);
         }
 
         return () => {
-            console.log('umounted. closing session');
-            if (session) {
-                session.off('history_updated', handleHistoryUpdated);
-                session.close();
+            console.log('Component unmounting, removing callback...');
+            // Only remove this component's callback, don't close the session
+            messageUpdateCallbacks.delete(setMessages);
+
+            // Only close session if no more components are using it
+            if (messageUpdateCallbacks.size === 0 && globalSession) {
+                console.log('No more components using session, cleaning up...');
+                globalSession.off('history_updated', handleHistoryUpdated);
+                globalSession.close();
+                globalSession = null;
+                isInitializing = false;
             }
         }
-    }, [session]);
+    }, [handleHistoryUpdated]);
 
     return {
         loading,
-        messages
+        messages,
+        session: globalSession
     }
 }
+
+// Export cleanup function for testing
+export const resetVoiceAgentState = () => {
+    if (globalSession) {
+        globalSession.close();
+        globalSession = null;
+    }
+    isInitializing = false;
+    messageUpdateCallbacks.clear();
+};
 
 export default useVoiceAgent;

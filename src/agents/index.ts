@@ -1,5 +1,15 @@
 import { AgentOrchestrator } from './agentOrchestrator';
+import {
+    createConciergeAgent,
+    createInterviewAgent,
+    createRealtimeSession,
+    connectAndSetupSession
+} from './voiceSessionFactory';
 
 export {
-    AgentOrchestrator
+    AgentOrchestrator,
+    createConciergeAgent,
+    createInterviewAgent,
+    createRealtimeSession,
+    connectAndSetupSession
 }
