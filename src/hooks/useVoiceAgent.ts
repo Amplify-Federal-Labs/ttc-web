@@ -50,7 +50,7 @@ const useVoiceAgent = () => {
             })
             .catch(console.error);
 
-        session.on('history_updated', (history: RealtimeItem[]) => {
+        const handleHistoryUpdated = (history: RealtimeItem[]) => {
             const messages: Message[] = history
                 .filter((item): item is RealtimeMessageItem => {
                     return typeof item == 'object';
@@ -64,7 +64,15 @@ const useVoiceAgent = () => {
                 });
 
             setMessages(messages);
-        });
+        };
+
+        session.on('history_updated', handleHistoryUpdated);
+
+        return () => {
+            console.log('umounted. closing session');
+            session.off('history_updated', handleHistoryUpdated);
+            session.close();
+        }
     }, []);
 
     return {
