@@ -1,5 +1,4 @@
 import { AppProvider } from "@toolpad/core/AppProvider";
-import Interview from "./pages/interview";
 import VoiceInterview from "./pages/voiceInterview";
 import SessionContext, { type Session } from "./SessionContext";
 import { CircularProgress } from "@mui/material";
