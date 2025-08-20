@@ -20,13 +20,13 @@ const InterviewHistory = ({ messages }: InterviewHistoryProps) => {
   }, [messages]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       style={{
-        minHeight: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end'
+        minHeight: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
       }}
     >
       <Stack spacing={2}>

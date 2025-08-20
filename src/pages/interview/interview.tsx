@@ -1,6 +1,6 @@
 import { Box, Divider, Stack } from "@mui/material";
 import type { Message } from "../../types";
-import InterviewHistory from "./interviewHistory";
+import InterviewHistory from "../components/interviewHistory";
 import UserPropmt from "./userPrompt";
 
 interface InterviewProps {
